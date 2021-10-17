@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Template for creating S3 Buckets
+Parameters:
+  RawBucketName:
+    Type: String
+    Description: Bucket used to store raw data for the data lake
+  ProcessedBucketName:
+    Type: String
+    Description: Bucket used to store processed data for the data lake
+
+Resources:
+  DatalakeRawBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref RawBucketName
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: CreatedBy
+          Value : Anirvan Sen
+        - Key: Application
+          Value: Data Engineering
+
+  DatalakeProcessedBucket:
+    Type:  AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref ProcessedBucketName
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: CreatedBy
+          Value: Anirvan Sen
+        - Key: Application
+          Value: Data Engineering
+Outputs:
+  RawBucket:
+    Description: Raw Bucket Arn
+    Value: !GetAtt [ DatalakeRawBucket, Arn ]
+    Export:
+      Name: DeltaLakeRawBucket
+
+  ProcessedBucket:
+    Description: Processed Bucket Arn
+    Value: !GetAtt [ DatalakeProcessedBucket, Arn ]
+    Export:
+      Name: DeltaLakeProcessedBucket
