@@ -1,0 +1,55 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Template for creating user, role, and IAM related permission
+
+Parameters:
+  UserName:
+    Type: String
+    Description: User name whom you want to give access to assume role
+  RawBucketArn:
+    Type: String
+    Description: Raw bucket ARN which will be passed from main stack
+  ProcessedBucketArn:
+    Type: String
+    Description: Raw bucket ARN which will be passed from main stack
+
+Resources:
+  S3AccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: s3-datalake-role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Join ['',[!Sub "arn:aws:iam::${AWS::AccountId}:user/",!Ref UserName]]
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IamManagedPolicy
+
+  IamManagedPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: Managed policy to allow s3 access
+      ManagedPolicyName: s3-managed-policy-datalake
+      Path: /
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: 's3:GetObject'
+            Resource:
+              - !Join [ '/', [ !Ref RawBucketArn,'*' ]]
+              - !Join [ '/', [ !Ref ProcessedBucketArn,'*' ]]
+          - Effect: Allow
+            Action: 's3:ListBucket'
+            Resource:
+              - !Ref RawBucketArn
+              - !Ref ProcessedBucketArn
+
+Outputs:
+  IamRole:
+    Description: IAM role
+    Value: !GetAtt [ S3AccessRole, Arn ]
+    Export:
+      Name: IamRoleArn

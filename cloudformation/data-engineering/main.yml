@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Template for creating S3 Buckets
+Parameters:
+  RawBucketName:
+    Type: String
+    Description: Bucket used to store raw data for the data lake
+    Default: dataengineering-datalake-raw
+  ProcessedBucketName:
+    Type: String
+    Description: Bucket used to store processed data for the data lake
+    Default: dataengineering-datalake-processed
+  UserName:
+    Type: String
+    Description: Username for giving assume role access
+    Default: data-lake-user
+  SharedBucketName:
+    Type: String
+    Description: Shared bucket for storing the cloudfromation scripts
+    Default: data-engineering-shared
+
+Resources:
+  S3Stack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        RawBucketName: !Ref RawBucketName
+        ProcessedBucketName: !Ref ProcessedBucketName
+      TemplateURL: !Sub
+          - 'https://${SharedBucketName}.s3.${AWS::Region}.amazonaws.com/data-engineering-stack/s3.yml'
+          - { SharedBucketName: !Ref SharedBucketName }
+      TimeoutInMinutes: 10
+
+  IAMStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        UserName: !Ref UserName
+        RawBucketArn: !GetAtt [ S3Stack, Outputs.RawBucket ]
+        ProcessedBucketArn: !GetAtt [ S3Stack, Outputs.ProcessedBucket ]
+      TemplateURL: !Sub
+          - 'https://${SharedBucketName}.s3.${AWS::Region}.amazonaws.com/data-engineering-stack/iam.yml'
+          - { SharedBucketName: !Ref SharedBucketName }
+      TimeoutInMinutes: 10
+
+
+
