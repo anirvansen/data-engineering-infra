@@ -41,4 +41,8 @@ jobs:
           name: data-engineering-stack
           template: "https://data-engineering-shared.s3.ap-south-1.amazonaws.com/data-engineering-stack/main.yml"
           no-fail-on-empty-changeset: "1"
+          capabilities:
+            - "CAPABILITY_IAM"
+            - "CAPABILITY_NAMED_IAM"
+            - "CAPABILITY_AUTO_EXPAND"
           parameter-overrides: "RawBucketName=dataengineering-lakehouse-raw,ProcessedBucketName=dataengineering-lakehouse-processed,UserName=data-lake-user,SharedBucketName=data-engineering-shared"
