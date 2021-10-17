@@ -34,3 +34,15 @@ jobs:
         run: >
           aws s3 cp ./cloudformation/data-engineering/.
           s3://data-engineering-shared/data-engineering-stack/  --recursive
+
+      - name: Deploy to AWS CloudFormation
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: data-engineering-stack
+          template: "https://data-engineering-shared.s3.ap-south-1.amazonaws.com/data-engineering-stack/main.yml"
+          no-fail-on-empty-changeset: "1"
+          parameter-overrides: >-
+          RawBucketName=dataengineering-datalake-raw,
+          ProcessedBucketName=dataengineering-datalake-processed,
+          UserName=data-lake-user,
+          SharedBucketName=data-engineering-shared"
