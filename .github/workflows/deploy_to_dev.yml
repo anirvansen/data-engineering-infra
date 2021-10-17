@@ -31,6 +31,6 @@ jobs:
 
       # Copy file to s3
       - name: Copy cloudformation template to s3
-        run: |
-          aws s3 cp ./data-engineering-infra/cloudformation/data-engineering/.
-          s3://data-engineering-shared/data-engineering-stack  --recursive
+        run: >
+          aws s3 cp ./cloudformation/data-engineering/.
+          s3://data-engineering-shared/data-engineering-stack/  --recursive
